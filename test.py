@@ -15,20 +15,20 @@ INSERT = 'INSERT INTO note (kurs, nazwa, timestamp) ' \
          'VALUES (:kurs, :nazwa, :timestamp)'
 
 
-res = requests.get('http://www.parkiet.com/temat/82.html')
+res = requests.get('http://www.bankier.pl/surowce/notowania')
 text = bs4.BeautifulSoup(res.text, "html.parser")
 
 def get_column_data(data_selector, class_value_selector):
     results=[]
     for i in text.find_all(data_selector, class_=class_value_selector):
-        results.append(i.string.strip())
+        results.append(i.string)
     return results
 
 
 def selector():
     selector_info = {
-        "kurs": ["td", "c"],
-        "nazwa": ["td", "nazwa"]
+        "kurs": ["td", "colKurs change down"],
+        "nazwa": ["td", "colWalor textNowrap"]
     }
     col_dict = {}
     for key_name, (selector_first, selector_second) in selector_info.iteritems():
@@ -36,9 +36,9 @@ def selector():
 
     pivoted_data = pivot_data(col_dict)
 
-    # print("pivoted_data (selector): " + str(pivoted_data))
+    print("pivoted_data (selector): " + str(pivoted_data))
 
-    data_in_db(pivoted_data)
+    # data_in_db(pivoted_data)
 
 def pivot_data(col_dict, timestamp=time.time()):
     output = []
