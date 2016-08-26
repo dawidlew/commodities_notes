@@ -1,6 +1,5 @@
 # coding=utf-8
-import requests, bs4
-import time
+import requests, bs4, time, re
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, _app_ctx_stack
 
@@ -8,35 +7,49 @@ from flask import Flask, request, session, g, redirect, url_for, abort, render_t
 # configuration
 DATABASE = 'data.db'
 DEBUG = True
-QUERY = 'select name, city, round(avg(price_min),2) as price_min, round(avg(price_max),2) as price_max ' \
-        'from note where timestamp in (select timestamp from note group by timestamp ' \
-        'order by timestamp desc limit 50) group by name, city'
+QUERY = 'select kurs, nazwa, timestamp from note'
 INSERT = 'INSERT INTO note (kurs, nazwa, timestamp) ' \
          'VALUES (:kurs, :nazwa, :timestamp)'
+DELETE_AGG = 'delete from note_agg'
+
+# ładujemy 10 wystąpień
+INSERT_AGG = 'insert into note_agg (nazwa, min_kurs, max_kurs) select nazwa, ' \
+             'min(replace(kurs, ",", ".")) as min_kurs, max(replace(kurs, ",", ".")) as max_kurs' \
+             ' from note where timestamp in ' \
+             '(select DISTINCT timestamp from note order by timestamp desc limit 10) group by nazwa'
+
+# wyciągamy z baze te, które wzrosły o co najmniej 10%
+SELECT = 'select nazwa, min_kurs, max_kurs, round(max_kurs-min_kurs,2) ' \
+         'as diff_kurs from note_agg' \
+         ' where diff_kurs > min_kurs * 0.1'
 
 
-res = requests.get('http://www.parkiet.com/temat/82.html')
+res = requests.get('http://www.bankier.pl/surowce/notowania')
 text = bs4.BeautifulSoup(res.text, "html.parser")
 
 def get_column_data(data_selector, class_value_selector):
     results=[]
-    for i in text.find_all(data_selector, class_=class_value_selector):
-        results.append(i.string.strip())
+    for i in text.findAll(data_selector, class_=class_value_selector):
+        # results.append(i.stripped_strings)
+        # results.append(i.string)
+        results.append(i.text)
+
     return results
 
 
 def selector():
     selector_info = {
-        "kurs": ["td", "c"],
-        "nazwa": ["td", "nazwa"]
+        "kurs": ["td", re.compile("^colKurs")],
+        "nazwa": ["td", re.compile("^colWalor")]
     }
     col_dict = {}
+
     for key_name, (selector_first, selector_second) in selector_info.iteritems():
         col_dict[key_name] = get_column_data(selector_first, selector_second)
 
     pivoted_data = pivot_data(col_dict)
 
-    # print("pivoted_data (selector): " + str(pivoted_data))
+    # print("pivoted_data (selector): " + str(pivoted_data).decode('utf8'))
 
     data_in_db(pivoted_data)
 
@@ -62,7 +75,6 @@ def pivot_data(col_dict, timestamp=time.time()):
     return output
 
 
-
 def data_in_db(pivoted_data):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
@@ -70,14 +82,22 @@ def data_in_db(pivoted_data):
     # print("pivoted_data (data_in_db):: " + str(pivoted_data))
 
     for values in pivoted_data:
-
-        # print("values ( for pivoted_data): " + str(values))
-
+        # print("values(pivoted_data): " + str(values))
         cursor.execute(INSERT, values)
+
+    cursor.execute(DELETE_AGG)
+    cursor.execute(INSERT_AGG)
     conn.commit()
 
-    results = conn.execute("select kurs, nazwa, timestamp from note")
-    print("results:" + str(results.fetchall()))
+    get_data()
+
+
+def get_data():
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    table = cursor.execute(SELECT).fetchall()
+    print table
 
 
 if __name__ == '__main__':
