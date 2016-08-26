@@ -1,8 +1,8 @@
 # coding=utf-8
-import requests, bs4, time, re
+import requests, bs4, time, re, smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from sqlite3 import dbapi2 as sqlite3
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, _app_ctx_stack
-
 
 # configuration
 DATABASE = 'data.db'
@@ -97,8 +97,26 @@ def get_data():
     cursor = conn.cursor()
 
     table = cursor.execute(SELECT).fetchall()
-    print table
+    send_mail(table)
 
+
+def send_mail(table):
+
+    # print str(table)
+
+    me = "itop_robot@allegro.pl"
+    you = "dawid.lewandowicz@allegrogroup.com"
+    msg = MIMEMultipart()
+    msg['Subject'] = "Kursy"
+    msg['From'] = me
+    msg['To'] = you
+
+    part = MIMEText(str(table), 'html', 'utf-8')
+    msg.attach(part)
+
+    s = smtplib.SMTP('smtp.qxlint')
+    s.sendmail(me, you, msg.as_string())
+    s.quit()
 
 if __name__ == '__main__':
     selector()

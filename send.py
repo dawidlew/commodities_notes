@@ -20,6 +20,10 @@ def get_data():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
+    # results=[]
+    # for i in text.findAll(data_selector, class_=class_value_selector):
+    #     results.append(i.text)
+
     table = cursor.execute(SELECT).fetchall()
 
     send_mail(table)
@@ -32,7 +36,7 @@ def send_mail(table):
     me = "itop_robot@allegro.pl"
     you = "dawid.lewandowicz@allegrogroup.com"
     msg = MIMEMultipart()
-    msg['Subject'] = "Kursy"
+    msg['Subject'] = "Kursy test"
     msg['From'] = me
     msg['To'] = you
 
