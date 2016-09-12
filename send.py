@@ -4,6 +4,8 @@ from sqlite3 import dbapi2 as sqlite3
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import rows as rows
+import html
 
 DATABASE = 'data.db'
 DEBUG = True
@@ -20,18 +22,36 @@ def get_data():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
-    # results=[]
-    # for i in text.findAll(data_selector, class_=class_value_selector):
-    #     results.append(i.text)
-
     table = cursor.execute(SELECT).fetchall()
-
+    print table
     send_mail(table)
 
 
 def send_mail(table):
 
-    print str(table)
+    # print str(table)
+
+    html = """
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>html title</title>
+  <style type="text/css" media="screen">
+    table{
+        background-color: #AAD373;
+        empty-cells:hide;
+    }
+    td.cell{
+        background-color: white;
+    }
+  </style>
+</head>
+<body>
+  <table style="border: blue 1px solid;">
+    <tr><td class="cell">Cell 1.1</td><td class="cell">Cell 1.2</td></tr>
+    <tr><td class="cell">Cell 2.1</td><td class="cell"></td></tr>
+  </table>
+</body>
+"""
 
     me = "itop_robot@allegro.pl"
     you = "dawid.lewandowicz@allegrogroup.com"
@@ -40,20 +60,10 @@ def send_mail(table):
     msg['From'] = me
     msg['To'] = you
 
-    html = """\
-    <html>
-      <head></head>
-      <body>
-        <p>Hi!<br>
-           How are you?<br>
-           Here is the <a href="https://www.python.org">link</a> you wanted.
-        </p>
-      </body>
-    </html>
-    """
-    part = MIMEText(str(table), 'html', 'utf-8')
-
-    msg.attach(part)
+    part1 = MIMEText(html, 'html', 'utf-8')
+    part2 = MIMEText(html, 'html', 'utf-8')
+    msg.attach(part1)
+    msg.attach(part2)
 
     s = smtplib.SMTP('smtp.qxlint')
     s.sendmail(me, you, msg.as_string())

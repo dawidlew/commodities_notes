@@ -4,6 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from sqlite3 import dbapi2 as sqlite3
 
+
 # configuration
 DATABASE = 'data.db'
 DEBUG = True
@@ -12,11 +13,11 @@ INSERT = 'INSERT INTO note (kurs, nazwa, timestamp) ' \
          'VALUES (:kurs, :nazwa, :timestamp)'
 DELETE_AGG = 'delete from note_agg'
 
-# ładujemy 10 wystąpień
+# ładujemy 20 wystąpień
 INSERT_AGG = 'insert into note_agg (nazwa, min_kurs, max_kurs) select nazwa, ' \
              'min(replace(kurs, ",", ".")) as min_kurs, max(replace(kurs, ",", ".")) as max_kurs' \
              ' from note where timestamp in ' \
-             '(select DISTINCT timestamp from note order by timestamp desc limit 10) group by nazwa'
+             '(select DISTINCT timestamp from note order by timestamp desc limit 20) group by nazwa'
 
 # wyciągamy z baze te, które wzrosły o co najmniej 10%
 SELECT = 'select nazwa, min_kurs, max_kurs, round(max_kurs-min_kurs,2) ' \
@@ -97,12 +98,14 @@ def get_data():
     cursor = conn.cursor()
 
     table = cursor.execute(SELECT).fetchall()
+
+
     send_mail(table)
 
 
 def send_mail(table):
 
-    # print str(table)
+    print table
 
     me = "itop_robot@allegro.pl"
     you = "dawid.lewandowicz@allegrogroup.com"

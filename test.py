@@ -1,5 +1,9 @@
-import smtplib
-
-server = smtplib.SMTP('smtp.qxlint')
-server.sendmail('itop@allegro.pl', 'dawid.lewandowicz@allegrogroup.com', 'tekst')
-server.quit()
+import HTML
+table_data = [
+        ['Last name',   'First name',   'Age'],
+        ['Smith',       'John',         30],
+        ['Carpenter',   'Jack',         47],
+        ['Johnson',     'Paul',         62],
+    ]
+htmlcode = HTML.table(table_data)
+print htmlcode
