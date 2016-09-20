@@ -117,9 +117,11 @@ def send_mail(table):
     part = MIMEText(str(table), 'html', 'utf-8')
     msg.attach(part)
 
-    s = smtplib.SMTP('smtp.qxlint')
-    s.sendmail(me, you, msg.as_string())
-    s.quit()
+    server_ssl = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+    server_ssl.ehlo()
+    server_ssl.login("dawid.stamdo@gmail.com", "dorota123")
+    server_ssl.sendmail(me, you, msg.as_string())
+    server_ssl.close()
 
 if __name__ == '__main__':
     selector()
