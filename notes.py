@@ -107,8 +107,8 @@ def send_mail(table):
 
     print table
 
-    me = "itop_robot@allegro.pl"
-    you = "dawid.lewandowicz@allegrogroup.com"
+    me = "commoditiesnotes@gmail.com"
+    you = "dawid.stamdo@gmail.com"
     msg = MIMEMultipart()
     msg['Subject'] = "Kursy"
     msg['From'] = me
@@ -119,7 +119,7 @@ def send_mail(table):
 
     server_ssl = smtplib.SMTP_SSL("smtp.gmail.com", 465)
     server_ssl.ehlo()
-    server_ssl.login("dawid.stamdo@gmail.com", "")
+    server_ssl.login("commoditiesnotes@gmail.com", "Dorota~!@")
     server_ssl.sendmail(me, you, msg.as_string())
     server_ssl.close()
 
