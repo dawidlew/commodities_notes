@@ -114,8 +114,10 @@ def send_mail(table):
     msg['From'] = me
     msg['To'] = you
 
+
     part = MIMEText(str(table), 'html', 'utf-8')
     msg.attach(part)
+
 
     server_ssl = smtplib.SMTP_SSL("smtp.gmail.com", 465)
     server_ssl.ehlo()
