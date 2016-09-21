@@ -105,7 +105,7 @@ def get_data():
 
 def send_mail(table):
 
-    print table
+    # print table
 
     me = "commoditiesnotes@gmail.com"
     you = "dawid.stamdo@gmail.com"
@@ -124,6 +124,8 @@ def send_mail(table):
     server_ssl.login("commoditiesnotes@gmail.com", "Dorota~!@")
     server_ssl.sendmail(me, you, msg.as_string())
     server_ssl.close()
+
+    print "Send email successfully"
 
 if __name__ == '__main__':
     selector()
