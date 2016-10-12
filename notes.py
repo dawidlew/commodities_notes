@@ -17,7 +17,7 @@ DELETE_AGG = 'delete from note_agg'
 INSERT_AGG = 'insert into note_agg (nazwa, min_kurs, max_kurs) select nazwa, ' \
              'min(replace(kurs, ",", ".")) as min_kurs, max(replace(kurs, ",", ".")) as max_kurs' \
              ' from note where timestamp in ' \
-             '(select DISTINCT timestamp from note order by timestamp desc limit 20) group by nazwa'
+             '(select DISTINCT timestamp from note order by timestamp desc limit 10) group by nazwa'
 
 # wyciągamy z baze te, które wzrosły o co najmniej 10%
 SELECT = 'select nazwa, min_kurs, max_kurs, round(max_kurs-min_kurs,2) ' \
