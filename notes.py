@@ -108,7 +108,7 @@ def send_mail(table):
     # print table
 
     me = "commoditiesnotes@gmail.com"
-    you = "dawid.stamdo@gmail.com"
+    you = "dawid.k.lewandowicz@gmail.com"
     msg = MIMEMultipart()
     msg['Subject'] = "Kursy"
     msg['From'] = me
