@@ -121,7 +121,7 @@ def send_mail(table):
 
     server_ssl = smtplib.SMTP_SSL("smtp.gmail.com", 465)
     server_ssl.ehlo()
-    server_ssl.login("commoditiesnotes@gmail.com", "Dorota~!@")
+    server_ssl.login("commoditiesnotes@gmail.com", "Dorota12345+")
     server_ssl.sendmail(me, you, msg.as_string())
     server_ssl.close()
 
